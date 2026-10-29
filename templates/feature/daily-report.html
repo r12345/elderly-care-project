@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日常报告生成 · 银发守护</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <script src="/static/js/jquery.min.js"></script>
+    {% csrf_token %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            padding: 16px 20px;
+            color: #1e293b;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .page-header {
+            margin-bottom: 16px;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #0f2b45;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-header h1 i {
+            color: #2563eb;
+            font-size: 1.4rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 3px 12px -4px rgba(0, 0, 0, 0.04);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e9eef2;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-header h2 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-header h2 i {
+            color: #2563eb;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 3px 8px -4px #93b4e0;
+            transition: all 0.15s;
+        }
+
+        .btn-primary:hover {
+            background: #1a4fbc;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            border: none;
+            color: #475569;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: #10b981;
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 3px 8px -4px rgba(16, 185, 129, 0.3);
+            transition: all 0.15s;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            color: #5f7d9c;
+            margin: 0 4px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .btn-icon:hover {
+            color: #2563eb;
+        }
+
+        /* 表单样式 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-item label {
+            font-size: 0.8rem;
+            color: #2b4f6e;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .form-item select,
+        .form-item input {
+            padding: 8px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            outline: none;
+            background: white;
+        }
+
+        .form-item select:focus,
+        .form-item input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid #e9eef2;
+        }
+
+        /* 统计卡片 */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e9eef2;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .summary-card .icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .summary-card .icon-box.blue {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .summary-card .icon-box.green {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .summary-card .icon-box.orange {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .summary-card .info .label {
+            color: #64748b;
+            font-size: 0.75rem;
+            margin-bottom: 2px;
+        }
+
+        .summary-card .info .value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e3a5f;
+        }
+
+        /* 表格样式 */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 800px;
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            color: #2b4f6e;
+            font-weight: 600;
+            background: #f8fafc;
+            border-bottom: 1px solid #dee7ef;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ecf1f5;
+            color: #1e3b4f;
+            white-space: nowrap;
+        }
+
+        .badge {
+            padding: 3px 10px;
+            border-radius: 24px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-purple {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        /* 搜索栏 */
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 32px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-top: 16px;
+            align-items: center;
+        }
+
+        .page-btn {
+            padding: 4px 10px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            color: #475569;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .page-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .page-btn:hover:not(.active) {
+            background: #f8fafc;
+        }
+
+        .page-info {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-right: 8px;
+        }
+
+        /* 详情弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9eef2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #64748b;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .modal-close:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            width: 120px;
+            color: #64748b;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #1e293b;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #e9eef2;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* 报告类型选择 */
+        .report-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .report-type-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .report-type-card:hover {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .report-type-card.selected {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .report-type-card i {
+            font-size: 1.3rem;
+            color: #2563eb;
+        }
+
+        .report-type-card .name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1e3a5f;
+        }
+
+        .report-type-card .desc {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+<div class="page-header">
+    <h1><i class="fas fa-file-signature"></i> 日常报告生成</h1>
+</div>
+
+<!-- 统计卡片 -->
+<div class="stats-summary">
+    <div class="summary-card">
+        <div class="icon-box blue">
+            <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="info">
+            <div class="label">今日生成</div>
+            <div class="value">{{ today_report_count }}</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <div class="icon-box green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="info">
+            <div class="label">本周报告</div>
+            <div class="value">{{ week_report_count }}</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <div class="icon-box orange">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="info">
+            <div class="label">异常报告</div>
+            <div class="value">{{ abnormal_report_count }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- 生成报告表单 -->
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-magic"></i> 生成新报告</h2>
+    </div>
+
+    <form id="reportForm" action="/dailyreportadd/" method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+            <div class="form-item">
+                <label for="reportNo">报告编号</label>
+                <input type="text" id="reportNo" name="report_no" placeholder="例如：RPT20260807001" required>
+            </div>
+            <div class="form-item">
+                <label for="elderSelect">选择老人</label>
+                <select id="elderSelect" name="elder_id">
+                    <option value="">全部老人</option>
+                    {% for elder in elderlist %}
+                    <option value="{{ elder.id }}">{{ elder.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-item">
+                <label for="reportDate">报告日期</label>
+                <input type="date" id="reportDate" name="report_date" value="{{ today }}">
+            </div>
+            <div class="form-item">
+                <label for="reportFormat">输出格式</label>
+                <select id="reportFormat" name="format">
+                    <option value="pdf">PDF 文档</option>
+                    <option value="word">Word 文档</option>
+                    <option value="excel">Excel 表格</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label for="reportStatus">生成状态</label>
+                <select id="reportStatus" name="status">
+                    <option value="生成中">生成中</option>
+                    <option value="已生成">已生成</option>
+                    <option value="待生成">待生成</option>
+                </select>
+            </div>
+            <input type="hidden" name="report_name" id="report_nameInput">
+            <input type="hidden" name="file_path" value="/static/report/R011.pdf">
+        </div>
+
+        <div style="margin-bottom: 12px;">
+            <label style="font-size: 0.8rem; color: #2b4f6e; font-weight: 600; display: block; margin-bottom: 8px;">
+                报告类型
+            </label>
+            <input type="hidden" id="reportTypeInput" name="report_type" value="健康数据">
+            <div class="report-type-grid">
+                <div class="report-type-card selected" data-type="健康数据报告" data-report-type="健康数据">
+                    <i class="fas fa-heartbeat"></i>
+                    <div>
+                        <div class="name">健康数据报告</div>
+                        <div class="desc">血压、血糖、心率等</div>
+                    </div>
+                </div>
+                <div class="report-type-card" data-type="行为活动报告" data-report-type="行为活动">
+                    <i class="fas fa-walking"></i>
+                    <div>
+                        <div class="name">行为活动报告</div>
+                        <div class="desc">日常活动轨迹统计</div>
+                    </div>
+                </div>
+                <div class="report-type-card" data-type="睡眠质量报告" data-report-type="睡眠质量">
+                    <i class="fas fa-bed"></i>
+                    <div>
+                        <div class="name">睡眠质量报告</div>
+                        <div class="desc">睡眠时长与质量</div>
+                    </div>
+                </div>
+                <div class="report-type-card" data-type="综合日报" data-report-type="综合日报">
+                    <i class="fas fa-clipboard-list"></i>
+                    <div>
+                        <div class="name">综合日报</div>
+                        <div class="desc">全部数据汇总</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="resetForm()">
+                <i class="fas fa-redo"></i> 重置
+            </button>
+            <button type="submit" class="btn-success">
+                <i class="fas fa-file-export"></i> 生成报告
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- 历史报告列表 -->
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-history"></i> 历史报告</h2>
+    </div>
+
+    <form class="search-bar" action="/dailyreport/" method="get">
+        <input type="text" class="search-input" placeholder="搜索报告名称、老人姓名..." id="searchInput" name="keyword" value="{{ keyword }}">
+        <select style="padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 32px; font-size: 0.8rem; outline: none;" id="typeFilter" name="report_type">
+            <option value="">全部类型</option>
+            <option value="健康数据" {% if report_type == '健康数据' %}selected{% endif %}>健康数据报告</option>
+            <option value="行为活动" {% if report_type == '行为活动' %}selected{% endif %}>行为活动报告</option>
+            <option value="睡眠质量" {% if report_type == '睡眠质量' %}selected{% endif %}>睡眠质量报告</option>
+            <option value="综合日报" {% if report_type == '综合日报' %}selected{% endif %}>综合日报</option>
+        </select>
+        <button type="submit" class="btn-primary" style="padding: 6px 16px;">
+            <i class="fas fa-search"></i> 搜索
+        </button>
+    </form>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>报告编号</th>
+                <th>报告名称</th>
+                <th>老人姓名</th>
+                <th>报告类型</th>
+                <th>生成时间</th>
+                <th>格式</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="reportTableBody">
+            {% for item in report_list %}
+            <tr>
+                <td>{{ item.report_no }}</td>
+                <td>{{ item.report_name }}</td>
+                <td>{{ item.elder.name }}</td>   <!-- 外键取老人姓名 -->
+                <td><span class="badge badge-success">{{ item.report_type }}</span></td>
+                <td>{{ item.create_time | date:'Y-m-d' }}</td>
+                <td>{{ item.file_format }}</td>
+                <td><span class="badge badge-warning">{{ item.status }}</span></td>
+                <td>
+                    <button class="btn-icon" title="查看" onclick="viewReport('{{ item.report_no|escapejs }}', '{{ item.report_name|escapejs }}', '{{ item.elder.name|escapejs }}', '{{ item.report_type|escapejs }}', '{{ item.create_time|date:'Y-m-d H:i:s'|escapejs }}', '{{ item.file_format|escapejs }}', '{{ item.status|escapejs }}', {{ item.id }})"><i class="fas fa-eye"></i></button>
+                    <button class="btn-icon" title="修改" onclick="editReport({{ item.id }})"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon" title="删除" onclick="deleteReport({{ item.id }})"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <span class="page-info">共 {{ report_list|length }} 条记录</span>
+        <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">4</button>
+        <button class="page-btn">5</button>
+        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+    </div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="modal-overlay" id="detailModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-info-circle" style="color: #2563eb;"></i> 报告详情</h3>
+            <button class="modal-close" onclick="closeDetail()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="detailContent">
+            <!-- 动态填充 -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeDetail()">关闭</button>
+            <button class="btn-primary" onclick="editReport(currentReportId)"><i class="fas fa-edit"></i> 编辑报告</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 报告类型选择
+    document.querySelectorAll('.report-type-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.report-type-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            document.getElementById('reportTypeInput').value = this.dataset.reportType || this.dataset.type;
+        });
+    });
+
+    // 重置表单
+    function resetForm() {
+        document.getElementById('reportForm').reset();
+        document.querySelectorAll('.report-type-card').forEach((c, i) => {
+            c.classList.toggle('selected', i === 0);
+        });
+        document.getElementById('reportTypeInput').value = '健康数据';
+    }
+    // 查看报告
+    let currentReportId = null;
+    function viewReport(reportNo, reportName, elderName, reportType, createTime, fileFormat, status, reportId) {
+        currentReportId = reportId;
+        const reportContent = document.getElementById('detailContent');
+        reportContent.innerHTML = `
+            <div class="detail-row">
+                <div class="detail-label">报告编号</div>
+                <div class="detail-value">${reportNo}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">报告名称</div>
+                <div class="detail-value">${reportName}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">老人姓名</div>
+                <div class="detail-value">${elderName}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">报告类型</div>
+                <div class="detail-value">${reportType}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">生成时间</div>
+                <div class="detail-value">${createTime}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">格式</div>
+                <div class="detail-value">${fileFormat}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">状态</div>
+                <div class="detail-value">${status}</div>
+            </div>
+        `;
+        document.getElementById('detailModal').classList.add('show');
+    }
+
+    // 关闭详情
+    function closeDetail() {
+        document.getElementById('detailModal').classList.remove('show');
+    }
+
+    // 点击弹窗外部关闭
+    document.getElementById('detailModal').addEventListener('click', function (event) {
+        if (event.target === this) {
+            closeDetail();
+        }
+    });
+
+    // 修改报告
+    function editReport(reportId) {
+        window.location.href = '/dailyreportupdate/?id=' + reportId;
+    }
+
+    // 删除报告
+    function deleteReport(reportId) {
+        window.location.href = '/dailyreportdel/?id=' + reportId
+    }
+
+    // 通知父页面加载完成
+    window.parent.postMessage({
+        type: 'pageLoaded',
+        page: 'dailyReport'
+    }, '*');
+
+    // 获取dom
+const elderSelect = document.getElementById('elderSelect');
+const reportNameInput = document.getElementById('report_nameInput');
+const cardList = document.querySelectorAll('.report-type-card');
+
+// 获取当前选中卡片的报告名称
+function getSelectedReportTypeText() {
+  const selectedCard = document.querySelector('.report-type-card.selected');
+  if(!selectedCard) return '';
+  return selectedCard.dataset.type;
+}
+
+// 拼接并赋值report_name
+function updateReportName() {
+  // 获取选中老人的文本（老人名字）
+  const elderName = elderSelect.options[elderSelect.selectedIndex].text;
+  const reportText = getSelectedReportTypeText();
+
+  // 拼接，没有老人就只传报告名称
+  let finalName = '';
+  if(elderSelect.value){
+    finalName = `${elderName}-${reportText}`;
+  }else{
+    finalName = reportText;
+  }
+  reportNameInput.value = finalName;
+}
+
+// 监听老人下拉变化
+elderSelect.addEventListener('change', updateReportName);
+
+// 点击卡片的时候，加上选中样式，同时更新name
+cardList.forEach(card=>{
+  card.addEventListener('click',function(){
+    // 清除其他选中
+    cardList.forEach(c=>c.classList.remove('selected'));
+    this.classList.add('selected');
+    updateReportName();
+  })
+})
+
+// 页面初始化执行一次，给初始值
+updateReportName();
+</script>
+</body>
+</html>

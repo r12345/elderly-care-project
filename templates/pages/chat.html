@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消息 · 银发守护</title>
+    <!-- 保持与原阈值页面相同的字体和图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <style>
+        /* ===== 基础样式 (完全沿用原阈值页面) ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            padding: 16px 20px;
+            color: #1e293b;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .page-header {
+            margin-bottom: 16px;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #0f2b45;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-header h1 i {
+            color: #2563eb;
+            font-size: 1.4rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 3px 12px -4px rgba(0, 0, 0, 0.04);
+            padding: 20px;
+            border: 1px solid #e9eef2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-header h2 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 3px 8px -4px #93b4e0;
+            transition: all 0.15s;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #1a4fbc;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        /* 新增：语音按钮圆形样式 (用于输入区) */
+        .btn-voice {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: #2563eb;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        .btn-voice:hover {
+            background: #eef2ff;
+            border-color: #2563eb;
+            transform: scale(1.02);
+        }
+
+        /* 在线徽章 + 新增电话徽章 */
+        .online-badge, .phone-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .online-badge {
+            background: #e6f7e6;
+            color: #0f6e3f;
+        }
+        .online-badge i {
+            font-size: 0.6rem;
+            color: #12b76a;
+        }
+        .phone-badge {
+            background: #e6f0ff;
+            color: #1e3a8a;
+            border: 1px solid #b9d3ff;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .phone-badge i {
+            color: #2563eb;
+            font-size: 0.85rem;
+        }
+        .phone-badge:hover {
+            background: #d4e2ff;
+        }
+
+        /* 聊天消息区域 */
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-height: 360px;   /* 稍微减少以容纳更多控件，保持视觉舒适 */
+            overflow-y: auto;
+            padding-right: 6px;
+            margin-bottom: 16px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .message.received {
+            justify-content: flex-start;
+        }
+
+        .message.sent {
+            flex-direction: row-reverse;
+            justify-content: flex-start;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            background: #eef2ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-size: 1rem;
+            flex-shrink: 0;
+            border: 1px solid #dbeafe;
+        }
+
+        .message-content {
+            max-width: 75%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            word-break: break-word;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .received .message-bubble {
+            background: #f1f5f9;
+            color: #0f172a;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .sent .message-bubble {
+            background: #2563eb;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.6rem;
+            color: #64748b;
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+
+        .sent .message-meta {
+            justify-content: flex-end;
+            padding-right: 4px;
+            color: #a5c9ff;
+        }
+
+        /* 聊天输入区 - 调整布局容纳语音按钮 */
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 18px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .chat-input-field {
+            flex: 1 1 200px;
+            padding: 12px 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            outline: none;
+            background: #f8fafc;
+            transition: all 0.15s;
+        }
+
+        .chat-input-field:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: white;
+        }
+
+        .chat-input-field::placeholder {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+
+        /* 输入区按钮组（发送+语音）靠右 */
+        .input-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* 状态条 */
+        .status-bar {
+            margin-top: 20px;
+            background: #dbeafe;
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+        }
+
+        .status-bar i {
+            color: #2563eb;
+            font-size: 1.1rem;
+        }
+
+        .status-bar span {
+            color: #1e3a8a;
+        }
+
+        .status-bar .time {
+            margin-left: auto;
+            color: #1e3a8a;
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <h1>
+        <i class="fas fa-comment-dots"></i> 聊天 · 银发守护
+    </h1>
+</div>
+
+<div class="card">
+    <!-- 卡片头部：对话对象 + 在线徽章 + 新增电话标签 -->
+    <div class="card-header">
+        <h2>
+            <i class="fas fa-user-headset" style="color: #2563eb;"></i>
+            后台健康管家
+        </h2>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <div class="online-badge">
+                <i class="fas fa-circle"></i> 在线 · 1分钟内回复
+            </div>
+            <!-- 新增电话标签 (模拟点击热线) -->
+            <div class="phone-badge" id="phoneBadge" title="点击拨打健康热线">
+                <i class="fas fa-phone-alt"></i> 400-881-xxxx
+            </div>
+        </div>
+    </div>
+
+    <!-- 聊天记录区域 (静态历史消息 + 动态插入) -->
+    <div class="chat-messages" id="chatMessages">
+        <!-- 后台消息 -->
+        <div class="message received">
+            <div class="message-avatar">
+                <i class="fas fa-user-nurse"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble received">
+                    您好，李伯伯！我是您的健康管家。今天身体感觉怎么样？有任何问题随时找我。
+                </div>
+                <div class="message-meta">
+                    <i class="far fa-clock"></i> 09:00
+                </div>
+            </div>
+        </div>
+
+        <!-- 老人消息 (自己) -->
+        <div class="message sent">
+            <div class="message-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble sent">
+                    小管家，我今天早上测了血压，收缩压138，舒张压88，是不是偏高呀？
+                </div>
+                <div class="message-meta">
+                    <i class="far fa-check-circle"></i> 已读 09:05
+                </div>
+            </div>
+        </div>
+
+        <!-- 后台回复 -->
+        <div class="message received">
+            <div class="message-avatar">
+                <i class="fas fa-user-nurse"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble received">
+                    李伯伯，这个数值在正常范围内偏高一点，但不用太担心。您先静坐15分钟再测一次，如果还是偏高我会帮您记录提醒。记得按时吃药哦。
+                </div>
+                <div class="message-meta">
+                    <i class="far fa-clock"></i> 09:06
+                </div>
+            </div>
+        </div>
+
+        <!-- 老人消息 -->
+        <div class="message sent">
+            <div class="message-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble sent">
+                    好的，我刚吃了降压药。另外最近晚上睡眠不太好，容易醒，有什么建议吗？
+                </div>
+                <div class="message-meta">
+                    <i class="far fa-check-circle"></i> 已读 09:10
+                </div>
+            </div>
+        </div>
+
+        <!-- 后台回复 -->
+        <div class="message received">
+            <div class="message-avatar">
+                <i class="fas fa-user-nurse"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble received">
+                    睡前可以喝一小杯温牛奶，少看手机。我把您的睡眠情况记录一下，稍后安排健康师给您电话回访好吗？
+                </div>
+                <div class="message-meta">
+                    <i class="far fa-clock"></i> 09:12
+                </div>
+            </div>
+        </div>
+
+        <!-- 老人消息 (最后一条历史) -->
+        <div class="message sent">
+            <div class="message-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble sent">
+                    好的，谢谢小管家！
+                </div>
+                <div class="message-meta">
+                    <i class="far fa-check-circle"></i> 已读 09:13
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 消息输入区域 + 新增语音按钮 -->
+    <div class="chat-input-area">
+        <input type="text" class="chat-input-field" id="messageInput" placeholder="输入消息…" value="我今天血糖有点高">
+        <div class="input-actions">
+            <!-- 语音按钮 (麦克风) -->
+            <button class="btn-voice" id="voiceButton" title="点击语音输入">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <!-- 原有发送按钮 -->
+            <button class="btn-primary" id="sendButton">
+                <i class="fas fa-paper-plane"></i> 发送
+            </button>
+        </div>
+    </div>
+
+    <!-- 状态栏 (最后回复时间会通过js更新) -->
+    <div class="status-bar" id="statusBar">
+        <i class="fas fa-shield-heart"></i>
+        <span>后台在线 · 通常1分钟内回复</span>
+        <span class="time" id="lastReplyTime"><i class="far fa-clock"></i> 最后回复 09:12</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ================== DOM 元素 ==================
+        const messagesContainer = document.getElementById('chatMessages');
+        const inputField = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const voiceButton = document.getElementById('voiceButton');
+        const phoneBadge = document.getElementById('phoneBadge');
+        const lastReplySpan = document.getElementById('lastReplyTime');
+
+        // 预设自动回复库 (亲切、贴合老年人场景)
+        const replyPool = [
+            "收到，李伯伯。您的消息已转给值班健康师。",
+            "感谢您的提醒，我们会留意您的健康数据。",
+            "好的，建议您多喝温水，有不适随时联系我。",
+            "您的消息已记录，祝您身体健康！",
+            "收到，请问还有什么可以帮助您的？",
+            "小管家明白，您放松心情，保持良好作息。"
+        ];
+
+        // 用于控制自动回复的定时器
+        let replyTimer = null;
+
+        // ================== 工具函数 ==================
+        function getCurrentTimeString() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function updateLastReplyTime(timeStr) {
+            if (lastReplySpan) {
+                lastReplySpan.innerHTML = `<i class="far fa-clock"></i> 最后回复 ${timeStr}`;
+            }
+        }
+
+        // ================== 创建消息DOM ==================
+        function createMessage(text, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;  // 'sent' 或 'received'
+
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'message-avatar';
+            const icon = document.createElement('i');
+            icon.className = type === 'sent' ? 'fas fa-user' : 'fas fa-user-nurse';
+            avatarDiv.appendChild(icon);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = `message-bubble ${type}`;
+            bubbleDiv.textContent = text;
+
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'message-meta';
+            const timeStr = getCurrentTimeString();
+
+            if (type === 'sent') {
+                metaDiv.innerHTML = `<i class="far fa-check-circle"></i> 已读 ${timeStr}`;
+            } else {
+                metaDiv.innerHTML = `<i class="far fa-clock"></i> ${timeStr}`;
+            }
+
+            contentDiv.appendChild(bubbleDiv);
+            contentDiv.appendChild(metaDiv);
+
+            messageDiv.appendChild(avatarDiv);
+            messageDiv.appendChild(contentDiv);
+
+            return messageDiv;
+        }
+
+        // ================== 发送消息 (老人) ==================
+        function sendUserMessage() {
+            const rawText = inputField.value.trim();
+            if (rawText === '') return;
+
+            const userMsg = createMessage(rawText, 'sent');
+            messagesContainer.appendChild(userMsg);
+            scrollToBottom();
+
+            inputField.value = '';
+
+            if (replyTimer) {
+                clearTimeout(replyTimer);
+                replyTimer = null;
+            }
+
+            replyTimer = setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * replyPool.length);
+                const replyText = replyPool[randomIndex];
+                const replyMsg = createMessage(replyText, 'received');
+                messagesContainer.appendChild(replyMsg);
+                scrollToBottom();
+
+                const nowStr = getCurrentTimeString();
+                updateLastReplyTime(nowStr);
+
+                replyTimer = null;
+            }, 1200);
+        }
+
+        // ================== 事件绑定 ==================
+        // 发送按钮
+        sendButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            sendUserMessage();
+        });
+
+        // 输入框回车
+        inputField.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendUserMessage();
+            }
+        });
+
+        // 新增：语音按钮模拟点击
+        voiceButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('🎤 语音输入功能开发中，您可先使用文字输入。');
+            // 可选：聚焦输入框提示语音
+            inputField.placeholder = '暂不支持语音，请打字...';
+            setTimeout(() => {
+                inputField.placeholder = '输入消息…';
+            }, 2000);
+        });
+
+        // 新增：电话标签模拟拨打
+        phoneBadge.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('📞 正在拨打健康热线 400-881-xxxx ……\n(演示模式，实际应用将跳转拨号)');
+        });
+
+        // ================== 初始化 ==================
+        window.addEventListener('load', function() {
+            scrollToBottom();
+            updateLastReplyTime('09:12');  // 匹配最后一条后台消息时间
+        });
+
+        // 保留原postMessage通知父页面
+        window.parent.postMessage({ type: 'pageLoaded', page: 'chat' }, '*');
+    })();
+</script>
+
+<!--
+    优化说明：
+    1. 在卡片头部新增了电话标签 (400-881-xxxxx)，点击模拟拨号。
+    2. 在输入区添加了圆形语音按钮，点击提示功能开发中。
+    3. 视觉上完全融合原有设计，颜色、圆角、间距一致。
+    4. 保留了所有聊天模拟功能 (发送、自动回复、时间戳)。
+-->
+</body>
+</html>

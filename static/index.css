@@ -1,0 +1,118 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f5f7fa;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-frame {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* 顶部栏 56px */
+.top-frame {
+    height: 56px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.02);
+    z-index: 10;
+    flex-shrink: 0;
+}
+.top-frame iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    overflow: hidden;
+    display: block;
+}
+
+.middle-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* 侧边栏固定靠左，宽度208px */
+.left-frame {
+    width: 208px;
+    background: white;
+    border-right: 1px solid #e2e8f0;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.left-frame iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    overflow: auto;
+    display: block;
+}
+
+.center-frame {
+    flex: 1;
+    background: #f8fafc;
+    overflow: hidden;
+    min-width: 0;
+}
+.center-frame iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    overflow: auto;
+    display: block;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 56px;
+    left: 208px;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    pointer-events: none;
+}
+.loading-overlay.active {
+    display: flex;
+}
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

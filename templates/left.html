@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>银发守护 · 菜单</title>
+<!--
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/left.css">
+
+</head>
+<body>
+<div class="sidebar">
+    <!-- 首页 -->
+    <div class="nav-section">
+        <div class="nav-item active" data-page="dashboard" data-url="pages/dashboard.html">
+            <i class="fas fa-chart-pie"></i>数据概览
+        </div>
+    </div>
+
+    <!-- 老人管理 -->
+    <div class="nav-section">
+        <div class="nav-item" data-page="elderMgmt" data-url="#">
+            <i class="fas fa-user-plus"></i>
+            <span>老人管理</span>
+            <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 0.7rem; transition: transform 0.2s;"></i>
+        </div>
+        <div class="sub-nav">
+            <div class="nav-item" data-page="elderInfo" data-url="/elderlist/">
+                <i class="fas fa-user"></i>老人信息
+            </div>
+            <div class="nav-item" data-page="behaviorTrace" data-url="/camerainfo/">
+                <i class="fas fa-map-marked-alt"></i>行为轨迹
+            </div>
+            <div class="nav-item" data-page="healthData" data-url="/healthdata/">
+                <i class="fas fa-heartbeat"></i>健康数据
+            </div>
+            <div class="nav-item" data-page="examRecords" data-url="/threshold/">
+                <i class="fas fa-file-medical"></i>体检记录
+            </div>
+            <div class="nav-item" data-page="medReminder" data-url="#">
+                <i class="fas fa-clock"></i>用药提醒
+            </div>
+        </div>
+    </div>
+
+    <!-- 安全监护 -->
+    <div class="nav-section">
+        <div class="nav-item" data-page="securityMgmt" data-url="#">
+            <i class="fas fa-shield-alt"></i>
+            <span>安全监护</span>
+            <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 0.7rem; transition: transform 0.2s;"></i>
+        </div>
+        <div class="sub-nav">
+            <div class="nav-item" data-page="eventList" data-url="#"><i class="fas fa-list-alt"></i>事件列表</div>
+            <div class="nav-item" data-page="fallRecords" data-url="#"><i class="fas fa-person-falling"></i>跌倒记录查询</div>
+            <div class="nav-item" data-page="longStay" data-url="#"><i class="fas fa-hourglass-half"></i>长时间滞留筛查</div>
+            <div class="nav-item" data-page="smokeAlarm" data-url="#"><i class="fas fa-smog"></i>烟雾报警记录</div>
+            <div class="nav-item" data-page="liveMonitor" data-url="#"><i class="fas fa-video"></i>实时监控</div>
+        </div>
+    </div>
+
+    <!-- 设备管理 -->
+    <div class="nav-section">
+        <div class="nav-item" data-page="deviceMgmt" data-url="#">
+            <i class="fas fa-microchip"></i>
+            <span>设备管理</span>
+            <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 0.7rem; transition: transform 0.2s;"></i>
+        </div>
+        <div class="sub-nav">
+            <div class="nav-item" data-page="camera" data-url="#"><i class="fas fa-camera"></i>摄像头管理</div>
+            <div class="nav-item" data-page="voiceTerm" data-url="#"><i class="fas fa-microphone-alt"></i>语音终端管理</div>
+            <div class="nav-item" data-page="gateway" data-url="#"><i class="fas fa-network-wired"></i>边缘网关管理</div>
+        </div>
+    </div>
+
+    <!-- 情感交互 -->
+    <div class="nav-section">
+        <div class="nav-item" data-page="emotionMgmt" data-url="#">
+            <i class="fas fa-smile"></i>
+            <span>情感交互</span>
+            <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 0.7rem; transition: transform 0.2s;"></i>
+        </div>
+        <div class="sub-nav">
+            <div class="nav-item" data-page="dialog" data-url="#"><i class="fas fa-comments"></i>对话记录</div>
+            <div class="nav-item" data-page="remindTasks" data-url="#"><i class="fas fa-tasks"></i>提醒任务</div>
+            <div class="nav-item" data-page="accompany" data-url="#"><i class="fas fa-hand-holding-heart"></i>陪伴记录</div>
+        </div>
+    </div>
+
+    <!-- 行为报告 -->
+    <div class="nav-section">
+        <div class="nav-item" data-page="reportMgmt" data-url="#">
+            <i class="fas fa-file-alt"></i>
+            <span>行为报告</span>
+            <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 0.7rem; transition: transform 0.2s;"></i>
+        </div>
+        <div class="sub-nav">
+            <div class="nav-item" data-page="dailyReport" data-url="/dailyreport/"><i class="fas fa-file-signature"></i>日常报告生成</div>
+            <div class="nav-item" data-page="behaviorMgmt" data-url="/behaviorrecord/"><i class="fas fa-database"></i>行为记录管理</div>
+        </div>
+    </div>
+
+    <!-- 系统管理 -->
+    <div class="nav-section">
+        <div class="nav-item" data-page="systemMgmt" data-url="#">
+            <i class="fas fa-cog"></i>
+            <span>系统管理</span>
+            <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 0.7rem; transition: transform 0.2s;"></i>
+        </div>
+        <div class="sub-nav">
+            <div class="nav-item" data-page="threshold" data-url="pages/threshold.html">
+                <i class="fas fa-sliders-h"></i>健康数据阈值设置
+            </div>
+            <div class="nav-item" data-page="rolePerm" data-url="#"><i class="fas fa-lock"></i>角色权限控制</div>
+            <div class="nav-item" data-page="userMgmt" data-url="#"><i class="fas fa-users-cog"></i>用户管理</div>
+            <div class="nav-item" data-page="operationLog" data-url="#"><i class="fas fa-history"></i>操作日志</div>
+            <div class="nav-item" data-page="dict" data-url="#"><i class="fas fa-book"></i>数据字典</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const menuItems = document.querySelectorAll('.nav-item[data-page]');
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const pageId = this.getAttribute('data-page');
+            const url = this.getAttribute('data-url');
+
+            menuItems.forEach(m => m.classList.remove('active'));
+            this.classList.add('active');
+
+            if (url && url !== '#') {
+                window.parent.postMessage({
+                    type: 'navigate',
+                    page: url
+                }, '*');
+            }
+        });
+    });
+
+    const defaultActive = document.querySelector('.nav-item[data-page="dashboard"]');
+    if (defaultActive) {
+        defaultActive.classList.add('active');
+    }
+    // 初始化：所有二级菜单默认收起，图标朝下
+    document.querySelectorAll('.sub-nav').forEach(sub => {
+        sub.style.display = 'none';
+    });
+
+    // 初始化所有一级菜单的箭头朝下
+    document.querySelectorAll('.nav-section > .nav-item .fa-chevron-down').forEach(arrow => {
+        arrow.style.transform = 'rotate(0deg)';
+    });
+
+    // 获取所有一级菜单项（带有子菜单的）
+    const parentMenuItems = document.querySelectorAll('.nav-section > .nav-item[data-page]');
+
+    // 为每个一级菜单添加点击事件
+    parentMenuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // 获取当前菜单项所在的nav-section
+            const section = this.closest('.nav-section');
+            // 获取该section下的二级菜单容器
+            const subNav = section.querySelector('.sub-nav');
+            // 获取箭头图标
+            const arrowIcon = this.querySelector('.fa-chevron-down');
+
+            // 如果存在二级菜单
+            if (subNav) {
+                // 切换二级菜单的显示状态
+                if (subNav.style.display === 'none') {
+                    subNav.style.display = 'block';
+                    if (arrowIcon) arrowIcon.style.transform = 'rotate(180deg)';
+                } else {
+                    subNav.style.display = 'none';
+                    if (arrowIcon) arrowIcon.style.transform = 'rotate(0deg)';
+                }
+            }
+
+            // 处理菜单激活状态和页面跳转
+            const pageId = this.getAttribute('data-page');
+            const url = this.getAttribute('data-url');
+
+            // 更新激活状态
+            document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
+            this.classList.add('active');
+
+            if (url && url !== '#') {
+                window.parent.postMessage({
+                    type: 'navigate',
+                    page: url
+                }, '*');
+            }
+        });
+    });
+
+    // 为二级菜单项添加点击事件
+    const subMenuItems = document.querySelectorAll('.sub-nav .nav-item');
+    subMenuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const pageId = this.getAttribute('data-page');
+            const url = this.getAttribute('data-url');
+
+            document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
+            this.classList.add('active');
+
+            const parentSection = this.closest('.nav-section');
+            if (parentSection) {
+                const parentMenuItem = parentSection.querySelector('> .nav-item');
+                if (parentMenuItem) {
+                    parentMenuItem.classList.add('active');
+                }
+            }
+
+            if (url && url !== '#') {
+                window.parent.postMessage({
+                    type: 'navigate',
+                    page: url
+                }, '*');
+            }
+        });
+    });
+
+    // 监听页面加载消息
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'pageLoaded') {
+            const currentPage = event.data.page;
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item.getAttribute('data-page') === currentPage) {
+                    document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
+                    item.classList.add('active');
+
+                    if (item.closest('.sub-nav')) {
+                        const parentSection = item.closest('.nav-section');
+                        if (parentSection) {
+                            const subNav = parentSection.querySelector('.sub-nav');
+                            const arrowIcon = parentSection.querySelector('> .nav-item .fa-chevron-down');
+                            if (subNav) {
+                                subNav.style.display = 'block';
+                                if (arrowIcon) arrowIcon.style.transform = 'rotate(180deg)';
+                            }
+                            const parentMenuItem = parentSection.querySelector('> .nav-item');
+                            if (parentMenuItem) {
+                                parentMenuItem.classList.add('active');
+                            }
+                        }
+                    } else {
+                        const section = item.closest('.nav-section');
+                        if (section) {
+                            const subNav = section.querySelector('.sub-nav');
+                            const arrowIcon = section.querySelector('> .nav-item .fa-chevron-down');
+                            if (subNav && subNav.style.display === 'none') {
+                                subNav.style.display = 'block';
+                                if (arrowIcon) arrowIcon.style.transform = 'rotate(180deg)';
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

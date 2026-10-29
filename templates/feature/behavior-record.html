@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>行为记录管理 · 银发守护</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <script src="/static/js/jquery.min.js"></script>
+    {% csrf_token %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            padding: 16px 20px;
+            color: #1e293b;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .page-header {
+            margin-bottom: 16px;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #0f2b45;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-header h1 i {
+            color: #2563eb;
+            font-size: 1.4rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 3px 12px -4px rgba(0, 0, 0, 0.04);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e9eef2;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-header h2 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-header h2 i {
+            color: #2563eb;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 3px 8px -4px #93b4e0;
+            transition: all 0.15s;
+        }
+
+        .btn-primary:hover {
+            background: #1a4fbc;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            border: none;
+            color: #475569;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 3px 8px -4px rgba(239, 68, 68, 0.3);
+            transition: all 0.15s;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            color: #5f7d9c;
+            margin: 0 4px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .btn-icon:hover {
+            color: #2563eb;
+        }
+
+        .btn-icon.danger:hover {
+            color: #ef4444;
+        }
+
+        /* 统计卡片 */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e9eef2;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .summary-card .icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .summary-card .icon-box.blue {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .summary-card .icon-box.red {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .summary-card .icon-box.green {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .summary-card .icon-box.orange {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .summary-card .info .label {
+            color: #64748b;
+            font-size: 0.75rem;
+            margin-bottom: 2px;
+        }
+
+        .summary-card .info .value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e3a5f;
+        }
+
+        /* 筛选区域 */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .filter-item label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .filter-item select,
+        .filter-item input {
+            padding: 7px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            outline: none;
+            background: white;
+            min-width: 140px;
+        }
+
+        .filter-item select:focus,
+        .filter-item input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        /* 表格样式 */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 1000px;
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            color: #2b4f6e;
+            font-weight: 600;
+            background: #f8fafc;
+            border-bottom: 1px solid #dee7ef;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ecf1f5;
+            color: #1e3b4f;
+            white-space: nowrap;
+        }
+
+        .badge {
+            padding: 3px 10px;
+            border-radius: 24px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .badge-normal {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-purple {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .badge-gray {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        /* 行为图标 */
+        .behavior-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .behavior-icon.walking {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .behavior-icon.sitting {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .behavior-icon.sleeping {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .behavior-icon.eating {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .behavior-icon.toilet {
+            background: #fce7f3;
+            color: #db2777;
+        }
+
+        .behavior-icon.fall {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .behavior-icon.unknown {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-top: 16px;
+            align-items: center;
+        }
+
+        .page-btn {
+            padding: 4px 10px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            color: #475569;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .page-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .page-btn:hover:not(.active) {
+            background: #f8fafc;
+        }
+
+        .page-info {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-right: 8px;
+        }
+
+        /* 详情弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9eef2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #64748b;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .modal-close:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            width: 120px;
+            color: #64748b;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #1e293b;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #e9eef2;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+<div class="page-header">
+    <h1><i class="fas fa-database"></i> 行为记录管理</h1>
+</div>
+
+<!-- 统计卡片 -->
+<div class="stats-summary">
+    <div class="summary-card">
+        <div class="icon-box blue">
+            <i class="fas fa-walking"></i>
+        </div>
+        <div class="info">
+            <div class="label">今日记录</div>
+            <div class="value">1,286</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <div class="icon-box red">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="info">
+            <div class="label">异常行为</div>
+            <div class="value">7</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <div class="icon-box green">
+            <i class="fas fa-user-friends"></i>
+        </div>
+        <div class="info">
+            <div class="label">活跃老人</div>
+            <div class="value">42</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <div class="icon-box orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="info">
+            <div class="label">平均活动时长</div>
+            <div class="value">6.8h</div>
+        </div>
+    </div>
+</div>
+
+<!-- 行为记录列表 -->
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-list-alt"></i> 行为记录列表</h2>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-primary" onclick="addRecord()">
+                <i class="fas fa-plus"></i> 新增
+            </button>
+            <button class="btn-secondary" onclick="exportRecords()">
+                <i class="fas fa-download"></i> 导出
+            </button>
+            <button class="btn-danger" onclick="batchDelete()">
+                <i class="fas fa-trash-alt"></i> 批量删除
+            </button>
+        </div>
+    </div>
+
+    <!-- 筛选栏 -->
+    <div class="filter-bar">
+        <div class="filter-item">
+            <label>老人姓名</label>
+            <select id="elderFilter">
+                <option value="">全部老人</option>
+                {% for elder in elderlist %}
+                <option value="{{ elder.id }}">{{ elder.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-item">
+            <label>行为类型</label>
+            <select id="behaviorFilter">
+                <option value="">全部类型</option>
+                <option value="walking">行走</option>
+                <option value="sitting">静坐</option>
+                <option value="sleeping">睡眠</option>
+                <option value="eating">进食</option>
+                <option value="toilet">如厕</option>
+                <option value="fall">跌倒</option>
+                <option value="unknown">未知</option>
+            </select>
+        </div>
+        <div class="filter-item">
+            <label>异常状态</label>
+            <select id="statusFilter">
+                <option value="">全部状态</option>
+                <option value="normal">正常</option>
+                <option value="warning">异常</option>
+                <option value="danger">危险</option>
+            </select>
+        </div>
+        <div class="filter-item">
+            <label>开始时间</label>
+            <input type="datetime-local" id="startTime">
+        </div>
+        <div class="filter-item">
+            <label>结束时间</label>
+            <input type="datetime-local" id="endTime">
+        </div>
+        <div class="filter-actions">
+            <button class="btn-secondary" onclick="resetFilter()">
+                <i class="fas fa-redo"></i> 重置
+            </button>
+            <button class="btn-primary" onclick="searchRecords()">
+                <i class="fas fa-search"></i> 查询
+            </button>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th style="width: 40px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                <th>记录ID</th>
+                <th>老人姓名</th>
+                <th>行为类型</th>
+                <th>位置</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>持续时长</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="recordTableBody">
+            <tr>
+                <td><input type="checkbox" class="record-checkbox" value="BR001"></td>
+                <td>BR20260806001</td>
+                <td><strong>张桂兰</strong></td>
+                <td>
+                    <span class="behavior-icon walking"><i class="fas fa-walking"></i></span>
+                    行走
+                </td>
+                <td>客厅</td>
+                <td>2026-08-06 08:15:30</td>
+                <td>2026-08-06 08:42:15</td>
+                <td>26分45秒</td>
+                <td><span class="badge badge-normal">正常</span></td>
+                <td>
+                    <button class="btn-icon" title="详情" onclick="showDetail('BR20260806001')"><i class="fas fa-eye"></i></button>
+                    <button class="btn-icon" title="修改" onclick="editRecord(this)"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon danger" title="删除" onclick="deleteRecord('BR20260806001')"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="record-checkbox" value="BR002"></td>
+                <td>BR20260806002</td>
+                <td><strong>李建国</strong></td>
+                <td>
+                    <span class="behavior-icon sitting"><i class="fas fa-chair"></i></span>
+                    静坐
+                </td>
+                <td>阳台</td>
+                <td>2026-08-06 09:00:00</td>
+                <td>2026-08-06 10:30:00</td>
+                <td>1小时30分</td>
+                <td><span class="badge badge-warning">久坐提醒</span></td>
+                <td>
+                    <button class="btn-icon" title="详情" onclick="showDetail('BR20260806002')"><i class="fas fa-eye"></i></button>
+                    <button class="btn-icon" title="修改" onclick="editRecord(this)"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon danger" title="删除" onclick="deleteRecord('BR20260806002')"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="record-checkbox" value="BR003"></td>
+                <td>BR20260806003</td>
+                <td><strong>王秀英</strong></td>
+                <td>
+                    <span class="behavior-icon sleeping"><i class="fas fa-bed"></i></span>
+                    睡眠
+                </td>
+                <td>卧室</td>
+                <td>2026-08-06 01:00:00</td>
+                <td>2026-08-06 06:30:00</td>
+                <td>5小时30分</td>
+                <td><span class="badge badge-warning">睡眠不足</span></td>
+                <td>
+                    <button class="btn-icon" title="详情" onclick="showDetail('BR20260806003')"><i class="fas fa-eye"></i></button>
+                    <button class="btn-icon" title="修改" onclick="editRecord(this)"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon danger" title="删除" onclick="deleteRecord('BR20260806003')"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="record-checkbox" value="BR004"></td>
+                <td>BR20260806004</td>
+                <td><strong>刘德明</strong></td>
+                <td>
+                    <span class="behavior-icon fall"><i class="fas fa-person-falling"></i></span>
+                    跌倒
+                </td>
+                <td>卫生间</td>
+                <td>2026-08-06 07:25:00</td>
+                <td>2026-08-06 07:26:30</td>
+                <td>1分30秒</td>
+                <td><span class="badge badge-danger">危险</span></td>
+                <td>
+                    <button class="btn-icon" title="详情" onclick="showDetail('BR20260806004')"><i class="fas fa-eye"></i></button>
+                    <button class="btn-icon" title="修改" onclick="editRecord(this)"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon danger" title="删除" onclick="deleteRecord('BR20260806004')"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="record-checkbox" value="BR005"></td>
+                <td>BR20260806005</td>
+                <td><strong>陈淑芬</strong></td>
+                <td>
+                    <span class="behavior-icon eating"><i class="fas fa-utensils"></i></span>
+                    进食
+                </td>
+                <td>餐厅</td>
+                <td>2026-08-06 12:00:00</td>
+                <td>2026-08-06 12:35:00</td>
+                <td>35分</td>
+                <td><span class="badge badge-normal">正常</span></td>
+                <td>
+                    <button class="btn-icon" title="详情" onclick="showDetail('BR20260806005')"><i class="fas fa-eye"></i></button>
+                    <button class="btn-icon" title="修改" onclick="editRecord(this)"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon danger" title="删除" onclick="deleteRecord('BR20260806005')"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="record-checkbox" value="BR006"></td>
+                <td>BR20260806006</td>
+                <td><strong>赵金宝</strong></td>
+                <td>
+                    <span class="behavior-icon toilet"><i class="fas fa-restroom"></i></span>
+                    如厕
+                </td>
+                <td>卫生间</td>
+                <td>2026-08-06 10:15:00</td>
+                <td>2026-08-06 10:22:00</td>
+                <td>7分</td>
+                <td><span class="badge badge-normal">正常</span></td>
+                <td>
+                    <button class="btn-icon" title="详情" onclick="showDetail('BR20260806006')"><i class="fas fa-eye"></i></button>
+                    <button class="btn-icon" title="修改" onclick="editRecord(this)"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon danger" title="删除" onclick="deleteRecord('BR20260806006')"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="record-checkbox" value="BR007"></td>
+                <td>BR20260806007</td>
+                <td><strong>孙美华</strong></td>
+                <td>
+                    <span class="behavior-icon unknown"><i class="fas fa-question"></i></span>
+                    未知
+                </td>
+                <td>厨房</td>
+                <td>2026-08-06 14:30:00</td>
+                <td>2026-08-06 14:32:00</td>
+                <td>2分</td>
+                <td><span class="badge badge-gray">待识别</span></td>
+                <td>
+                    <button class="btn-icon" title="详情" onclick="showDetail('BR20260806007')"><i class="fas fa-eye"></i></button>
+                    <button class="btn-icon" title="修改" onclick="editRecord(this)"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon danger" title="删除" onclick="deleteRecord('BR20260806007')"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <span class="page-info">共 1,286 条记录，当前显示 1-7 条</span>
+        <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">4</button>
+        <button class="page-btn">5</button>
+        <button class="page-btn">...</button>
+        <button class="page-btn">184</button>
+        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+    </div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="modal-overlay" id="detailModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-info-circle" style="color: #2563eb;"></i> 行为记录详情</h3>
+            <button class="modal-close" onclick="closeDetail()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="detailContent">
+            <!-- 动态填充 -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeDetail()">关闭</button>
+            <button class="btn-primary" onclick="closeDetail()"><i class="fas fa-edit"></i> 编辑记录</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 全选/取消全选
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.record-checkbox');
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    }
+
+    // 搜索记录
+    function searchRecords() {
+        const elder = document.getElementById('elderFilter').value;
+        const behavior = document.getElementById('behaviorFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const startTime = document.getElementById('startTime').value;
+        const endTime = document.getElementById('endTime').value;
+        alert('查询条件：老人=' + elder + ', 行为=' + behavior + ', 状态=' + status);
+    }
+
+    // 重置筛选
+    function resetFilter() {
+        document.getElementById('elderFilter').value = '';
+        document.getElementById('behaviorFilter').value = '';
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('startTime').value = '';
+        document.getElementById('endTime').value = '';
+    }
+
+    // 显示详情
+    function showDetail(recordId) {
+        const detailContent = document.getElementById('detailContent');
+        detailContent.innerHTML = `
+            <div class="detail-row">
+                <div class="detail-label">记录编号</div>
+                <div class="detail-value">${recordId}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">老人姓名</div>
+                <div class="detail-value">张桂兰</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">行为类型</div>
+                <div class="detail-value"><span class="behavior-icon walking"><i class="fas fa-walking"></i></span>行走</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">位置</div>
+                <div class="detail-value">客厅 - 摄像头01</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">开始时间</div>
+                <div class="detail-value">2026-08-06 08:15:30</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">结束时间</div>
+                <div class="detail-value">2026-08-06 08:42:15</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">持续时长</div>
+                <div class="detail-value">26分45秒</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">状态</div>
+                <div class="detail-value"><span class="badge badge-normal">正常</span></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">识别置信度</div>
+                <div class="detail-value">96.8%</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">数据来源</div>
+                <div class="detail-value">AI 视觉分析（摄像头01）</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">备注</div>
+                <div class="detail-value">活动轨迹正常，步频稳定</div>
+            </div>
+        `;
+        document.getElementById('detailModal').classList.add('show');
+    }
+
+    // 关闭详情
+    function closeDetail() {
+        document.getElementById('detailModal').classList.remove('show');
+    }
+
+    // 新增记录
+    function addRecord() {
+        alert('打开新增行为记录弹窗');
+    }
+
+    // 修改记录
+    function editRecord(btn) {
+        const row = btn.closest('tr');
+        const recordId = row.cells[1].textContent;
+        alert('修改记录: ' + recordId);
+    }
+
+    // 删除单条记录
+    function deleteRecord(recordId) {
+        if (confirm('确认删除记录 ' + recordId + ' 吗？此操作不可恢复。')) {
+            alert('记录已删除: ' + recordId);
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const checked = document.querySelectorAll('.record-checkbox:checked');
+        if (checked.length === 0) {
+            alert('请先选择要删除的记录');
+            return;
+        }
+        if (confirm('确认删除选中的 ' + checked.length + ' 条记录吗？此操作不可恢复。')) {
+            alert('已删除 ' + checked.length + ' 条记录');
+        }
+    }
+
+    // 导出记录
+    function exportRecords() {
+        alert('导出功能：将筛选后的记录导出为 Excel 文件');
+    }
+
+    // 点击弹窗外部关闭
+    document.getElementById('detailModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDetail();
+        }
+    });
+
+    // 通知父页面加载完成
+    window.parent.postMessage({
+        type: 'pageLoaded',
+        page: 'behaviorMgmt'
+    }, '*');
+</script>
+</body>
+</html>

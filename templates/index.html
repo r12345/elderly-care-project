@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>银发守护 · 主框架</title>
+    <link rel="stylesheet" href="/static/index.css">
+    <script>
+        
+    </script>
+</head>
+<body>
+<div class="app-frame">
+    <div class="top-frame">
+        <iframe src="/top/" name="topFrame" id="topFrame" title="顶部导航"></iframe>
+    </div>
+
+    <div class="middle-container">
+        <div class="left-frame">
+            <iframe src="/left/" name="leftFrame" id="leftFrame" title="左侧菜单"></iframe>
+        </div>
+        <div class="center-frame">
+            <iframe src="/dashboard/" name="centerFrame" id="centerFrame" title="主要内容"></iframe>
+        </div>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+
+<script>
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'navigate') {
+            const page = event.data.page;
+            const centerFrame = document.getElementById('centerFrame');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            if (centerFrame) {
+                loadingOverlay.classList.add('active');
+                centerFrame.src = page;
+
+                centerFrame.onload = function() {
+                    loadingOverlay.classList.remove('active');
+                };
+            }
+        }
+    });
+
+    window.addEventListener('error', function(e) {
+        console.error('页面加载失败:', e);
+        document.getElementById('loadingOverlay').classList.remove('active');
+    }, true);
+
+    /* (function() {
+
+     })();*/
+
+    // 登录成功后调用
+    /*function loginSuccess() {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        window.location.href = 'index.html';
+    }*/
+</script>
+</body>
+</html>

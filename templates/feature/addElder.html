@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加老人 · 银发守护</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+    <script src="/static/js/jquery.min.js"></script>
+
+    <script>
+
+        //文档就绪
+        $(function (){
+
+            $("#name").blur(function (){
+                let name = $(this).val()
+                if(name === ""){
+                    $(this).removeClass('err');
+                    $('.tip').hide();
+                }
+
+                //异步向后台发送请求
+                $.ajax({
+                    url:"/getelderbyname/",
+                    type:"post",
+                    data:{"name":name},
+                    success:function (data){
+                        if(data === "ok"){
+                            //用户名已存在
+                            $('#name').addClass('err');
+                            $('.tip').show();
+                            $("#btnsub").addClass('fa-disabled');
+                        }else{
+                            $('#name').removeClass('err');
+                            $('.tip').hide();
+                            $("#btnsub").removeClass('fa-disabled');
+                        }
+                    }
+                })
+            })
+
+        })
+
+    </script>
+
+
+    <style>
+
+        /* 不可点击 + 半透明 + 灰掉 */
+        .fa-disabled {
+          opacity: 0.5;
+          pointer-events: none; /* 完全禁止点击、hover、事件 */
+          cursor: not-allowed !important; /* 禁用光标 */
+        }
+
+
+        /* 重复错误样式 */
+        #name.err{
+            border-color: #f53f3f;
+            background: #fff2f2;
+        }
+        /* 气泡提示 */
+        .tip-box{
+            position: relative;
+            display: inline-block;
+        }
+        .tip{
+            position: absolute;
+            left: 10px;
+            top: 110%;
+            background: #f53f3f;
+            color: #fff;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            display: none;
+            z-index: 99;
+        }
+
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            padding: 16px 20px;
+            color: #1e293b;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .page-header {
+            margin-bottom: 16px;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #0f2b45;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-header h1 i {
+            color: #2563eb;
+            font-size: 1.4rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 3px 12px -4px rgba(0, 0, 0, 0.04);
+            padding: 20px;
+            border: 1px solid #e9eef2;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-header h2 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1e3a5f;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 3px 8px -4px #93b4e0;
+            transition: all 0.15s;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #1a4fbc;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            border: none;
+            color: #475569;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* 表单样式 */
+        .form-container {
+            max-width: 800px;
+        }
+
+        .form-row {
+            display: flex;
+            margin-bottom: 16px;
+            gap: 16px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #2b4f6e;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        /* 单选框样式 */
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            padding: 8px 0;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: #1e3b4f;
+        }
+
+        .radio-item input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #2563eb;
+            cursor: pointer;
+        }
+
+        /* 按钮区域 */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+<div class="page-header">
+    <h1><i class="fas fa-user-plus"></i> 添加老人信息</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-edit"></i> 基本信息填写</h2>
+    </div>
+
+    <form id="elderForm" class="form-container" action="/elderadd/" method="post" enctype="multipart/form-data">
+        <div class="form-row">
+            <div class="form-group tip-box">
+                <label class="form-label" for="name">姓名</label>
+                <input type="text" id="name" name="name" class="form-input" placeholder="请输入老人姓名" required>
+                <div class="tip"><i class="fas fa-info-circle"></i> 用户名已存在，请更换</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="age">年龄</label>
+                <input type="number" id="age" name="age" class="form-input" placeholder="请输入老人年龄" min="0" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">性别</label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="sex_male" name="gender" value="0"  required>
+                        <label for="sex_male">男</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="sex_female" name="gender" value="1">
+                        <label for="sex_female">女</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="name">照片</label>
+                <input type="file" id="name" name="photo" class="form-input"  required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="kin">紧急联系人</label>
+                <input type="text" id="kin" name="contact" class="form-input" placeholder="请输入紧急联系人姓名" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="relation">关系</label>
+                <input type="text" id="relation" name="relatives" class="form-input" placeholder="如：儿子、女儿、配偶等" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="phone">联系电话</label>
+                <input type="tel" id="phone" name="phone" class="form-input" placeholder="请输入联系电话" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="stat">健康状况</label>
+                <input type="text" id="stat" name="healthcondition" class="form-input" placeholder="如：健康、高血压、糖尿病等" required>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> 返回
+            </button>
+            <button type="submit" class="btn-primary" id="btnsub">
+                <i class="fas fa-save"></i> 保存
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+
+    
+    // 向父页面发送加载完成消息
+    window.parent.postMessage({
+        type: 'pageLoaded',
+        page: 'elderAdd'
+    }, '*');
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理</title>
+    <script src="/static/js/jquery.min.js"></script>
+    <script>
+        $(function (){
+            $("name").blur()
+        $.ajax({
+            url:/getelderbyname/,
+            type:"post",
+            data:{"name":name},
+            success:function (data){
+                if(data==="ok"){
+                    $('#name').addClass('err');
+                    $('.tip').show();
+                    
+                }
+            }
+        })
+        })
+    </script>
+</head>
+<body>
+<input id="name" type="text" >
+</body>
+</html>

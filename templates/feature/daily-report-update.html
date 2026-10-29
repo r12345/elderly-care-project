@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日常报告修改 · 银发守护</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    {% csrf_token %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            padding: 16px 20px;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            margin-bottom: 16px;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #0f2b45;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-header h1 i {
+            color: #2563eb;
+            font-size: 1.4rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 3px 12px -4px rgba(0, 0, 0, 0.04);
+            padding: 20px;
+            border: 1px solid #e9eef2;
+            max-width: 1080px;
+        }
+
+        .card-header {
+            margin-bottom: 16px;
+        }
+
+        .card-header h2 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-header h2 i {
+            color: #2563eb;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-item label {
+            font-size: 0.8rem;
+            color: #2b4f6e;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .form-item select,
+        .form-item input {
+            padding: 8px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            outline: none;
+            background: white;
+        }
+
+        .form-item select:focus,
+        .form-item input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid #e9eef2;
+        }
+
+        .btn {
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            box-shadow: 0 3px 8px -4px #93b4e0;
+        }
+
+        .btn-primary:hover {
+            background: #1a4fbc;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+<div class="page-header">
+    <h1><i class="fas fa-edit"></i> 日常报告修改</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-file-signature"></i> 修改报告信息</h2>
+    </div>
+
+    <form id="updateReportForm" action="/dailyreportupdate/" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ report.id }}">
+
+        <div class="form-grid">
+            <div class="form-item">
+                <label for="reportNo">报告编号</label>
+                <input type="text" id="reportNo" name="report_no" value="{{ report.report_no }}" placeholder="例如：RPT20260807001" required>
+            </div>
+
+            <div class="form-item">
+                <label for="reportType">报告类型</label>
+                <select id="reportType" name="report_type">
+                    <option value="健康数据" {% if report.report_type == '健康数据' or report.report_type == 'health' %}selected{% endif %}>健康数据报告</option>
+                    <option value="行为活动" {% if report.report_type == '行为活动' or report.report_type == 'behavior' %}selected{% endif %}>行为活动报告</option>
+                    <option value="睡眠质量" {% if report.report_type == '睡眠质量' or report.report_type == 'sleep' %}selected{% endif %}>睡眠质量报告</option>
+                    <option value="综合日报" {% if report.report_type == '综合日报' or report.report_type == 'full' %}selected{% endif %}>综合日报</option>
+                </select>
+            </div>
+
+            <div class="form-item">
+                <label for="elderSelect">选择老人</label>
+                <select id="elderSelect" name="elder_id" required>
+                    <option value="">请选择老人</option>
+                    {% for elder in elderlist %}
+                    <option value="{{ elder.id }}" {% if report.elder_id == elder.id %}selected{% endif %}>{{ elder.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="hidden" name="report_name" id="report_name-input">
+
+            <div class="form-item">
+                <label for="reportDate">报告日期</label>
+                <input type="date" id="reportDate" name="report_date" value="{{ report.create_time|date:'Y-m-d' }}">
+            </div>
+
+            <div class="form-item">
+                <label for="reportFormat">输出格式</label>
+                <select id="reportFormat" name="format">
+                    <option value="PDF" {% if report.file_format == 'PDF' or report.file_format == 'pdf' %}selected{% endif %}>PDF 文档</option>
+                    <option value="Word" {% if report.file_format == 'Word' or report.file_format == 'word' %}selected{% endif %}>Word 文档</option>
+                    <option value="Excel" {% if report.file_format == 'Excel' or report.file_format == 'excel' %}selected{% endif %}>Excel 表格</option>
+                </select>
+            </div>
+
+            <div class="form-item">
+                <label for="reportStatus">生成状态</label>
+                <select id="reportStatus" name="status">
+                    <option value="生成中" {% if report.status == '生成中' %}selected{% endif %}>生成中</option>
+                    <option value="已生成" {% if report.status == '已生成' %}selected{% endif %}>已生成</option>
+                    <option value="待生成" {% if report.status == '待生成' %}selected{% endif %}>待生成</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                <i class="fas fa-times"></i> 取消
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> 保存
+            </button>
+        </div>
+    </form>
+
+<script>
+// 获取元素
+const elderSel = document.getElementById('elderSelect');
+const typeSel = document.getElementById('reportType');
+const reportNameInput = document.getElementById('report_name-input');
+
+// 拼接函数：老人名称 + 报告类型
+function updateReportName(){
+    // 获取选中的老人文本
+    let elderName = elderSel.options[elderSel.selectedIndex].text;
+    // 获取选中报告类型value
+    let typeVal = typeSel.value;
+    if(elderSel.value && typeVal){
+        reportNameInput.value = elderName + typeVal + "报告";
+    }else{
+        reportNameInput.value = '';
+    }
+}
+
+// 监听两个下拉框改变事件
+elderSel.addEventListener('change', updateReportName);
+typeSel.addEventListener('change', updateReportName);
+
+// 编辑回显页面加载时执行一次，回填初始拼接值
+window.onload = function(){
+    updateReportName();
+}
+</script>
+</div>
+</body>
+</html>

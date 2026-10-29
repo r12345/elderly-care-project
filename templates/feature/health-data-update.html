@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康数据修改</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 顶部标题 */
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-header .icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* 卡片容器 */
+        .form-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-title::before {
+            content: "";
+            width: 4px;
+            height: 18px;
+            background-color: #3b82f6;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+
+        /* 表单网格布局 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-item label {
+            font-size: 14px;
+            color: #4b5563;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-item input,
+        .form-item select {
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1f2937;
+            transition: border-color 0.2s;
+        }
+
+        .form-item input:focus,
+        .form-item select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* 按钮区域 */
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <div class="icon">♥</div>
+            <h1>健康数据修改</h1>
+        </div>
+        <form action="/healthdataupdate/" method="post">
+             {% csrf_token %}
+            <input type="hidden" name="id" value="{{ healthdata.id }}">
+            <!-- 表单卡片 -->
+            <div class="form-card">
+            <div class="form-title">健康记录</div>
+            
+            <div class="form-grid">
+                <div class="form-item">
+                    <label for="oldName">老人姓名</label>
+                    <input type="text" id="oldName" name="name" value="{{ healthdata.elder.name }}" required>
+                </div>
+
+                <!-- 血压 -->
+                <div class="form-item">
+                    <label for="bloodPressure">血压 (mmHg)</label>
+                    <input type="text" id="bloodPressure" name="bloodPressure" value="{{ healthdata.bloodPressure }}" placeholder="例如：120" required>
+                </div>
+
+                <!-- 血糖 -->
+                <div class="form-item">
+                    <label for="bloodSugar">血糖 (mmol/L)</label>
+                    <input type="number" id="bloodSugar" name="bloodSugar" step="0.1" value="{{ healthdata.bloodSugar }}" placeholder="例如：5.6" required>
+                </div>
+
+                <!-- 心率 -->
+                <div class="form-item">
+                    <label for="heartRate">心率 (bpm)</label>
+                    <input type="number" id="heartRate" name="heartRate" value="{{ healthdata.heartRate }}" placeholder="例如：72">
+                </div>
+
+                <!-- 血氧 -->
+                <div class="form-item">
+                    <label for="bloodOxygen">血氧 (%)</label>
+                    <input type="number" id="bloodOxygen" name="bloodOxygen" value="{{ healthdata.bloodOxygen }}" placeholder="例如：98">
+                </div>
+
+                <!-- 体温 -->
+                <div class="form-item">
+                    <label for="temperature">体温 (℃)</label>
+                    <input type="number" id="temperature" name="temperature" value="{{ healthdata.temperature}}" step="0.1" placeholder="例如：36.5">
+                </div>
+
+                <!-- 体重 -->
+                <div class="form-item">
+                    <label for="weight">体重 (kg)</label>
+                    <input type="number" id="weight" step="0.1" name="weight" value="{{ healthdata.weight }}" placeholder="例如：60.0">
+                </div>
+
+                <!-- 记录时间 -->
+                <div class="form-item">
+                    <label for="recordTime">记录时间</label>
+                    <input type="datetime-local" name="recordTime" value="{{ healthdata.recordTime }}" id="recordTime">
+                </div>
+            </div>
+                
+
+            <!-- 按钮 -->
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="window.history.back()">取消</button>
+                <button class="btn btn-primary" type="submit" >保存</button>
+            </div>
+        </div>
+        </form>
+    </div>
+</body>
+</html>

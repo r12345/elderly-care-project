@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="/static/js/jquery.min.js"></script>
+<script>
+    $(function(){
+        $.ajax({
+            url:"http://localhost:8000/app/book/",
+            type:"get",
+            success:function (data){
+                $.each(data,function (index,book){
+                    $("#tab").append("<tr><td>"+book.bookname+"</td><td>"+book.bookauthor+"</td><td>"+book.press_display.pressname+"</td><tr>")
+                })
+                alert(1)
+                
+            }
+        })
+        
+    })
+</script>
+<table id="tab" border="1" cellpadding="0" width="50%">
+    <tr>
+        <th>图书名称</th>
+        <th>图书作者</th>
+        <th>图书出版社</th>
+    </tr>
+</table>
+</body>
+</html>

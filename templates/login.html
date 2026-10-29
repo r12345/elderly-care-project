@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>银发守护 · 登录</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/login.css">
+</head>
+<body>
+<!-- 背景装饰 -->
+<!--<div class="bg-decoration">
+    <div class="circle-1"></div>
+    <div class="circle-2"></div>
+    <div class="heart-icon-1"><i class="fas fa-heart"></i></div>
+    <div class="heart-icon-2"><i class="fas fa-heart"></i></div>
+    <div class="heart-icon-3"><i class="fas fa-hand-holding-heart"></i></div>
+</div>-->
+
+<!-- 登录卡片 -->
+<div class="login-container">
+    <!-- 左侧品牌区域 -->
+    <div class="brand-side">
+        <div class="brand-logo">
+            <div class="brand-logo-icon">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div>
+                <div class="brand-logo-text">银发守护</div>
+                <div class="brand-tagline">SilverGuard</div>
+            </div>
+        </div>
+
+        <div class="brand-content">
+            <div class="brand-quote">
+                用心守护<br>每一寸光阴
+                <span>让科技传递温暖，让关爱触手可及</span>
+            </div>
+
+            <div class="brand-features">
+                <div class="feature-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>实时安全监护 · 跌倒检测 · 轨迹追踪</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>健康数据管理 · 异常预警 · 用药提醒</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-comments"></i>
+                    <span>情感交互陪伴 · 语音对话 · 温馨提醒</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="brand-footer">
+            © 2026 银发守护 · 智慧养老平台
+        </div>
+    </div>
+
+    <!-- 右侧登录表单 -->
+    <div class="form-side">
+        <div class="form-header">
+            <h2>系统登录</h2>
+            <p>请输入您的账号和密码</p>
+        </div>
+
+        <!-- 登录表单 -->
+        <form class="login-form" action="/login/?method=post" method="post">
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-user"></i>
+                    账号
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" placeholder="请输入账号" value="guardian" id="usernameInput">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-lock"></i>
+                    密码
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="请输入密码" value="123456" id="passwordInput">
+                    <button type="submit" class="toggle-password" onclick="togglePassword()">
+                        <i class="far fa-eye" id="toggleIcon" style="margin-left: -30px;margin-top:-10px"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" checked>
+                    <span>记住密码</span>
+                </label>
+                <a href="#" class="forgot-password" onclick="alert('请联系系统管理员重置密码')">忘记密码？</a>
+            </div>
+
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i>
+                登录系统
+            </button>
+        </form>
+
+
+        <!-- 用于显示错误消息 -->
+        <div style="margin-top: 16px; text-align: center; font-size: 0.75rem; color: brown;">
+            {{msg}}
+            {% for message in messages %}
+                {% if message %}
+                    {{ message }}
+                {% endif %}
+            {% endfor %}
+            
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

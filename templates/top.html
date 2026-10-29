@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>银发守护 · 头部</title>
+<!--
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/top.css">
+</head>
+<body>
+<div class="top-bar">
+    <div class="logo-area">
+        <div class="logo-icon"><i class="fas fa-heart"></i></div>
+        <div>
+            <span class="logo-text">银发守护</span>
+            <span class="system-title">智慧养老</span>
+        </div>
+    </div>
+
+    <div class="user-area">
+        <div class="datetime" id="datetime">
+            <i class="far fa-calendar-alt"></i>
+            <span id="dateDisplay"></span>
+            <i class="far fa-clock" style="margin-left: 6px;"></i>
+            <span id="timeDisplay"></span>
+        </div>
+
+        <div class="notification-badge">
+            <i class="far fa-bell"></i>
+            <span class="badge-dot"></span>
+        </div>
+
+        <div class="user-info">
+            <div class="user-avatar"></div>
+            <div class="user-details">
+                <span class="user-name">{{ username }}</span>
+                <span class="user-role">照护师</span>
+            </div>
+            <i class="fas fa-chevron-down" style="font-size: 0.7rem; color: #94a3b8;"></i>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateDateTime() {
+        const now = new Date();
+
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
+        const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+        const weekday = weekdays[now.getDay()];
+
+        document.getElementById('dateDisplay').textContent = `${year}/${month}/${day} ${weekday}`;
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        document.getElementById('timeDisplay').textContent = `${hours}:${minutes}:${seconds}`;
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+</script>
+</body>
+</html>
